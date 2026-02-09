@@ -1,5 +1,5 @@
 'use client';
-import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useEffect } from 'react';
@@ -34,10 +34,15 @@ const getStatusIcon = (status) => {
     });
 };
 
-export default function Map({ complaints, showHeatmap }) {
-    // Center of India roughly
-    const defaultCenter = [20.5937, 78.9629];
-    const defaultZoom = 5;
+export default function Map({ complaints, showHeatmap, defaultCenter = [20.5937, 78.9629], defaultZoom = 5 }) {
+
+    function MapController({ center, zoom }) {
+        const map = useMap();
+        useEffect(() => {
+            map.flyTo(center, zoom);
+        }, [center, zoom, map]);
+        return null;
+    }
 
     return (
         <MapContainer
@@ -46,6 +51,7 @@ export default function Map({ complaints, showHeatmap }) {
             style={{ height: '100%', width: '100%', borderRadius: '12px', zIndex: 1 }}
             scrollWheelZoom={true}
         >
+            <MapController center={defaultCenter} zoom={defaultZoom} />
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

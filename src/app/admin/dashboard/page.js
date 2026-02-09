@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { complaints } from '@/utils/mockData';
 
@@ -10,7 +11,8 @@ const Map = dynamic(() => import('@/components/Map'), {
 });
 
 export default function AdminDashboard() {
-    const [filter, setFilter] = useState('All');
+    const [statusFilter, setStatusFilter] = useState('All');
+    const [categoryFilter, setCategoryFilter] = useState('All');
     const [search, setSearch] = useState('');
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
     const [showHeatmap, setShowHeatmap] = useState(false);
@@ -21,9 +23,13 @@ export default function AdminDashboard() {
     const [isAiLoading, setIsAiLoading] = useState(true);
 
     const filteredComplaints = complaints.filter(c =>
-        (filter === 'All' || c.status === filter) &&
+        (statusFilter === 'All' || c.status === statusFilter) &&
+        (categoryFilter === 'All' || c.category === categoryFilter) &&
         (c.description.toLowerCase().includes(search.toLowerCase()) || c.id.toLowerCase().includes(search.toLowerCase()))
     );
+
+    // Extract unique categories for filter
+    const categories = ['All', ...new Set(complaints.map(c => c.category))];
 
     const stats = {
         new: complaints.filter(c => c.status === 'Submitted').length,
@@ -78,7 +84,7 @@ export default function AdminDashboard() {
             {/* New AI Analytics Section */}
             <div className="ai-insights-card card mb-4">
                 <div className="ai-header">
-                    <h3>🧠 Civic Intelligence Layer (Powered by Gemini 2.5 Flash)</h3>
+                    <h3>Civic Intelligence Layer (Powered by Gemini 2.5 Flash)</h3>
                     <span className={`ai-badge ${isAiLoading ? 'animate-pulse' : ''}`}>
                         {isAiLoading ? 'Analyzing...' : 'Live Analysis'}
                     </span>
@@ -134,14 +140,23 @@ export default function AdminDashboard() {
                         />
                         <select
                             className="form-control"
-                            value={filter}
-                            onChange={(e) => setFilter(e.target.value)}
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
                         >
                             <option value="All">All Status</option>
                             <option value="Submitted">New Complaint</option>
                             <option value="In Progress">Under Working</option>
-                            <option value="Pending">Unresolved (Pending)</option>
+                            <option value="Pending">Unresolved</option>
                             <option value="Resolved">Resolved</option>
+                        </select>
+                        <select
+                            className="form-control"
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value)}
+                        >
+                            {categories.map(cat => (
+                                <option key={cat} value={cat}>{cat === 'All' ? 'All Issues' : cat}</option>
+                            ))}
                         </select>
                     </div>
                 </div>
@@ -186,7 +201,9 @@ export default function AdminDashboard() {
                                         </span>
                                     </td>
                                     <td>
-                                        <button className="btn btn-outline btn-sm">Manage</button>
+                                        <Link href={`/admin/dashboard/complaint/${c.id}`} className="btn btn-outline btn-sm">
+                                            Manage
+                                        </Link>
                                     </td>
                                 </tr>
                             ))}
@@ -238,7 +255,8 @@ export default function AdminDashboard() {
         .table { width: 100%; border-collapse: collapse; }
         .table th, .table td { text-align: left; padding: 1rem; border-bottom: 1px solid #e2e8f0; }
         .table th { font-weight: 600; color: #64748b; background: #f8fafc; }
-        .table tr:hover { background: #f8fafc; }
+        .table tr { border-bottom: 1px solid #e2e8f0; transition: background 0.2s; }
+        .table tr:hover { background: #f1f5f9; color: #0f172a; }
         
         /* Flex Utils */
         .flex { display: flex; }

@@ -4,18 +4,23 @@ import LoginModal from '@/components/LoginModal';
 
 export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
+  const [loginTab, setLoginTab] = useState('citizen');
+
+  const openLogin = (tab) => {
+    setLoginTab(tab);
+    setShowLogin(true);
+  };
 
   return (
     <main className="min-h-screen">
       <nav className="navbar">
         <div className="container nav-container">
           <div className="logo">
-            <span className="logo-icon">🏛️</span>
             Civic Hero
           </div>
           <div className="nav-actions">
-            <button className="btn btn-outline" onClick={() => setShowLogin(true)}>Login</button>
-            <button className="btn btn-primary" onClick={() => setShowLogin(true)}>Sign Up</button>
+            <button className="btn btn-outline" onClick={() => openLogin('citizen')}>Login</button>
+            <button className="btn btn-primary" onClick={() => openLogin('citizen')}>Sign Up</button>
           </div>
         </div>
       </nav>
@@ -28,10 +33,10 @@ export default function Home() {
             we connect you directly to the right department.
           </p>
           <div className="hero-cta">
-            <button className="btn btn-primary btn-large" onClick={() => setShowLogin(true)}>
+            <button className="btn btn-primary btn-large" onClick={() => openLogin('citizen')}>
               Start Reporting Now
             </button>
-            <button className="btn btn-outline btn-large" onClick={() => setShowLogin(true)}>
+            <button className="btn btn-outline btn-large" onClick={() => openLogin('admin')}>
               Admin Login
             </button>
           </div>
@@ -67,7 +72,7 @@ export default function Home() {
         </div>
       </footer>
 
-      {showLogin && <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />}
+      {showLogin && <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} initialTab={loginTab} />}
 
       <style jsx>{`
         .navbar {
@@ -106,7 +111,7 @@ export default function Home() {
         h1 {
           font-size: 3.5rem;
           margin-bottom: 1.5rem;
-          background: linear-gradient(135deg, #1e293b 0%, var(--primary) 100%);
+          background: linear-gradient(135deg, #f1f5f9 0%, var(--primary) 100%);
           -webkit-background-clip: text;
           background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -136,6 +141,7 @@ export default function Home() {
         }
         .feature-card {
           background: white;
+          color: #1e293b;
           padding: 2rem;
           border-radius: 1rem;
           box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);

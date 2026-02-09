@@ -1043,21 +1043,21 @@ export const complaints = [
 ];
 
 export const users = [
-    {
-        id: 'USR-001',
-        phone: '9876543210',
-        role: 'citizen',
-        language: 'English'
-    },
-    {
-        id: 'ADM-001',
-        username: 'admin',
-        password: 'password123',
-        role: 'admin',
-        department: 'Central'
-    }
+  {
+    id: 'USR-001',
+    phone: '9876543210',
+    role: 'citizen',
+    language: 'English'
+  },
+  {
+    id: 'ADM-001',
+    username: 'admin',
+    password: 'password123',
+    role: 'admin',
+    department: 'Central'
+  }
 ];
 
 export const addComplaint = (newComplaint) => {
-    complaints.unshift(newComplaint);
+  complaints.unshift(newComplaint);
 };

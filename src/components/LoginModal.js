@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function LoginModal({ isOpen, onClose }) {
-    const [activeTab, setActiveTab] = useState('citizen'); // 'citizen' or 'admin'
+export default function LoginModal({ isOpen, onClose, initialTab = 'citizen' }) {
+    const [activeTab, setActiveTab] = useState(initialTab); // 'citizen' or 'admin'
     const [step, setStep] = useState(1); // 1: Phone, 2: OTP, 3: Language
     const [phone, setPhone] = useState('');
     const [otp, setOtp] = useState('');
@@ -193,7 +193,12 @@ export default function LoginModal({ isOpen, onClose }) {
         .w-full { width: 100%; }
         .subtitle { color: #64748b; margin-bottom: 1.5rem; font-size: 0.9rem; }
         .language-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        .language-grid .btn-outline { color: #334155; border-color: #cbd5e1; }
+        .language-grid .btn-outline:hover { background: #f1f5f9; }
+        .language-grid .btn-outline.active { background: var(--primary); color: white; border-color: var(--primary); }
         .btn-link { background: none; border: none; color: var(--primary); margin-top: 1rem; cursor: pointer; display: block; width: 100%; }
+        
+        h2 { color: #1e293b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.5rem; }
       `}</style>
         </div>
     );

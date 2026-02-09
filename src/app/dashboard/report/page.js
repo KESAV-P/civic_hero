@@ -16,20 +16,59 @@ export default function ReportIssue() {
 
     const issueTypes = [
         { value: 'pothole', label: '🕳️ Pothole' },
-        { value: 'garbage', label: '🗑️ Garbage Dump' },
-        { value: 'light', label: '💡 Faulty Streetlight' },
+        { value: 'garbage', label: '🗑️ Garbage Overflow' },
+        { value: 'light', label: '💡 Streetlight Not Working' },
         { value: 'water', label: '💧 Water Leakage' },
-        { value: 'tree', label: '🌳 Fallen Tree' },
-        { value: 'other', label: '❓ Other' }
+        { value: 'sewage', label: '🤢 Sewage Blockage' },
+        { value: 'footpath', label: '🚶 Damaged Footpath' },
+        { value: 'manhole', label: '🕳️ Open Manhole' }, // Distinct emoji if possible, or same
+        { value: 'traffic', label: '🚦 Traffic Signal Malfunction' },
+        { value: 'dumping', label: '🚯 Illegal Dumping' },
+        { value: 'flood', label: '🌊 Road Flooding' },
+        { value: 'tree', label: '🌳 Fallen Tree' }
     ];
 
     const handleLocation = () => {
         setLoading(true);
-        // Simulate GPS fetch
-        setTimeout(() => {
-            setFormData(prev => ({ ...prev, location: { lat: 12.9716, lng: 77.5946, address: 'Near Main Street Application demo' } }));
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser.');
             setLoading(false);
-        }, 1000);
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const { latitude, longitude } = position.coords;
+            try {
+                // Fetch address from Nominatim (OpenStreetMap)
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                const data = await response.json();
+
+                setFormData(prev => ({
+                    ...prev,
+                    location: {
+                        lat: latitude,
+                        lng: longitude,
+                        address: data.display_name || `Lat: ${latitude.toFixed(5)}, Lng: ${longitude.toFixed(5)}`
+                    }
+                }));
+            } catch (error) {
+                console.error("Geocoding failed", error);
+                setFormData(prev => ({
+                    ...prev,
+                    location: {
+                        lat: latitude,
+                        lng: longitude,
+                        address: `Detected Location (${latitude.toFixed(5)}, ${longitude.toFixed(5)})`
+                    }
+                }));
+            } finally {
+                setLoading(false);
+            }
+        }, (error) => {
+            console.error('Error fetching location:', error);
+            alert('Unable to retrieve your location. Please check your browser permissions.');
+            setLoading(false);
+        }, { enableHighAccuracy: true });
     };
 
     const handleSubmit = (e) => {
@@ -48,9 +87,14 @@ export default function ReportIssue() {
                 return found ? found.label.split(' ').slice(1).join(' ') : type;
             };
 
-            const dept = formData.issueType === 'pothole' ? 'Roads Dept' :
-                formData.issueType === 'light' ? 'Electrical Dept' :
-                    formData.issueType === 'garbage' ? 'Sanitation Dept' : 'General Admin';
+            // Enhanced Auto-Routing Logic
+            let dept = 'General Admin';
+            const type = formData.issueType;
+            if (['pothole', 'footpath', 'manhole', 'dumping'].includes(type)) dept = 'Roads & Transport';
+            if (['light', 'traffic'].includes(type)) dept = 'Electrical Dept';
+            if (['garbage', 'sewage'].includes(type)) dept = 'Sanitation Dept';
+            if (['water', 'flood'].includes(type)) dept = 'Water Supply Dept';
+            if (['tree'].includes(type)) dept = 'Horticulture Dept';
 
             const newComplaint = {
                 id: newId,
